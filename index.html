@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Chords</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a href="#" class="logo" aria-label="Simple Chords home">
+      <span class="logo-icon">♪</span><span>Simple Chords</span>
+    </a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a href="#songs">Songs</a>
+      <button id="openEditorButton" class="nav-editor-button" type="button">＋ Add song</button>
+      <a href="#about">About</a>
+      <button id="themeButton" class="theme-button" type="button" aria-label="Switch theme">🌙</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">PLAY · SING · WORSHIP</p>
+      <h1>Lyrics and chords made simple.</h1>
+      <p class="hero-description">Create, organize, transpose, and read your songs in one clean place.</p>
+      <div class="search-box">
+        <label class="sr-only" for="searchInput">Search songs</label>
+        <span class="search-icon">⌕</span>
+        <input id="searchInput" type="search" placeholder="Search by song title or artist..." autocomplete="off">
+      </div>
+    </section>
+
+    <section id="songs" class="content-layout">
+      <aside class="song-library">
+        <div class="section-heading">
+          <div><p class="small-label">LIBRARY</p><h2>Songs</h2></div>
+          <span id="songCount" class="song-count">1 song</span>
+        </div>
+        <div id="songList" class="song-list"></div>
+        <p id="emptyMessage" class="empty-message" hidden>No song found. Try another title.</p>
+      </aside>
+
+      <article class="song-view">
+        <div class="song-top">
+          <div>
+            <p id="songArtist" class="song-artist"></p>
+            <h2 id="songTitle" class="song-title"></h2>
+            <div class="song-tags">
+              <span id="songKey" class="tag"></span>
+              <span id="songDifficulty" class="tag"></span>
+              <span id="songCategory" class="tag"></span>
+            </div>
+          </div>
+          <div class="song-actions">
+            <button id="editSongButton" class="secondary-button" type="button">✎ Edit</button>
+            <button id="deleteSongButton" class="danger-button" type="button">Delete</button>
+            <button id="favoriteButton" class="favorite-button" type="button">♡ Favorite</button>
+          </div>
+        </div>
+
+        <div class="song-controls">
+          <div class="control-group">
+            <span class="control-label">Transpose</span>
+            <button id="transposeDown" class="control-button" type="button">−</button>
+            <strong id="transposeValue">0</strong>
+            <button id="transposeUp" class="control-button" type="button">+</button>
+          </div>
+          <div class="control-group">
+            <span class="control-label">Text size</span>
+            <button id="fontDown" class="control-button" type="button">A−</button>
+            <button id="fontUp" class="control-button" type="button">A+</button>
+          </div>
+          <button id="chordsButton" class="show-chords-button" type="button">Hide chords</button>
+        </div>
+        <div id="songContent" class="song-content" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section id="about" class="about-section">
+      <p class="small-label">ABOUT</p>
+      <h2>Your personal chord library</h2>
+      <p>Add songs with chords directly above the lyrics. The editor detects chord lines automatically and creates a clean song page.</p>
+    </section>
+  </main>
+
+  <div id="editorModal" class="editor-modal" hidden>
+    <div class="editor-backdrop" data-close-editor></div>
+    <section class="editor-panel" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+      <div class="editor-header">
+        <div><p class="small-label">SONG EDITOR</p><h2 id="editorTitle">Add a new song</h2></div>
+        <button id="closeEditorButton" class="close-editor-button" type="button" aria-label="Close editor">×</button>
+      </div>
+
+      <form id="songForm" class="song-form">
+        <input id="editingSongId" type="hidden">
+        <div class="form-grid">
+          <label>Song title<input id="editorSongTitle" type="text" placeholder="Example: This Is the Day" required></label>
+          <label>Artist or songwriter<input id="editorArtist" type="text" placeholder="Example: Traditional" required></label>
+          <label>Original key
+            <select id="editorKey" required>
+              <option>C</option><option>C#</option><option>D</option><option>D#</option><option>E</option><option>F</option><option>F#</option><option selected>G</option><option>G#</option><option>A</option><option>A#</option><option>B</option>
+            </select>
+          </label>
+          <label>Difficulty<select id="editorDifficulty"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></label>
+          <label class="full-width">Category<input id="editorCategory" type="text" placeholder="Worship, Hymn or Gospel" value="Worship"></label>
+        </div>
+
+        <div class="editor-toolbar">
+          <button id="insertTemplateButton" type="button" class="toolbar-button">▤ Insert template</button>
+          <button id="findReplaceButton" type="button" class="toolbar-button">⌕ Find & replace</button>
+          <button id="hotKeysButton" type="button" class="toolbar-button">⚡ Hot keys</button>
+          <span class="detection-status"><span class="status-dot"></span><strong id="detectedChordCount">0</strong> chord lines detected</span>
+        </div>
+
+        <div id="findReplacePanel" class="find-replace-panel" hidden>
+          <input id="findText" type="text" placeholder="Find text">
+          <input id="replaceText" type="text" placeholder="Replace with">
+          <button id="replaceAllButton" type="button" class="toolbar-button">Replace all</button>
+        </div>
+
+        <div class="editor-workspace">
+          <div class="plain-editor-wrap">
+            <div id="lineNumbers" class="line-numbers" aria-hidden="true">1</div>
+            <textarea id="editorSongText" spellcheck="false" required aria-label="Song lyrics and chords"></textarea>
+          </div>
+          <aside class="editor-preview-panel">
+            <div class="preview-heading"><strong>Live preview</strong><span>Detected chords are purple</span></div>
+            <div id="editorLivePreview" class="editor-live-preview"></div>
+          </aside>
+        </div>
+
+        <div class="editor-help">
+          <strong>Type chords on the line above the lyrics.</strong>
+          The editor recognizes chords such as <code>G</code>, <code>Am</code>, <code>Cmaj7</code>, <code>F#m</code>, and <code>D/F#</code>.
+          Put section names inside brackets, for example <code>[Verse 1]</code> or <code>[Chorus]</code>.
+        </div>
+        <p id="editorMessage" class="editor-message" aria-live="polite"></p>
+        <div class="editor-footer">
+          <button id="cancelEditorButton" class="secondary-button" type="button">Cancel</button>
+          <button class="save-song-button" type="submit">Save song</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="hotKeysModal" class="mini-modal" hidden>
+    <div class="mini-modal-card">
+      <button id="closeHotKeysButton" class="close-editor-button" type="button">×</button>
+      <h3>Editor hot keys</h3>
+      <p><kbd>Tab</kbd> inserts spaces.</p>
+      <p><kbd>Ctrl</kbd> + <kbd>S</kbd> saves the song.</p>
+      <p><kbd>Ctrl</kbd> + <kbd>F</kbd> opens Find & Replace.</p>
+    </div>
+  </div>
+
+  <footer class="site-footer"><p>© <span id="year"></span> Simple Chords.</p></footer>
+  <script src="script.js"></script>
+</body>
+</html>
